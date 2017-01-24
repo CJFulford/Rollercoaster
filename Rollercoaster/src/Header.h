@@ -8,4 +8,12 @@ const float PI = 3.14159265359f,
 			PI2 = 2.f * PI,
 			floatError = 0.0001f;	//used for float rounding errors
 
-const int WINDOW_SIZE = 700;
+const int WINDOW_SIZE = 500;
+
+
+/*
+	Tutorial help
+
+	1) get it so we can make ou track.
+
+*/

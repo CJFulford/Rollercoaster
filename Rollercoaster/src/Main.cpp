@@ -52,12 +52,17 @@ int main()
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	glm::vec3 vertices = glm::vec3(0.f, 0.f, 5.f);
+	glm::vec3 vertices[] = 
+	{
+		glm::vec3(-0.25f, -0.25f, 0.25f),
+		glm::vec3(-0.25f, 0.25f, 0.5f),
+		glm::vec3(0.25f, 0.25f, 0.75f),
+	};
 
 	glGenBuffers(1, &vertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
 	glEnableVertexAttribArray(0);
 
 	glBindVertexArray(0);
@@ -65,8 +70,7 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClearBufferfv(GL_COLOR, 0, clearColor);
-		glClearBufferfv(GL_DEPTH, 0, &zero);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 
 		glPointSize(30);
@@ -74,7 +78,7 @@ int main()
 		glBindVertexArray(vertexArray);
 		glUseProgram(program);
 
-		glDrawArrays(GL_POINTS, 0, 1);
+		glDrawArrays(GL_POINTS, 0, 3);
 
 		glBindVertexArray(0);
 
