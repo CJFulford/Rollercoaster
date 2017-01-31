@@ -24,10 +24,13 @@
     <ClCompile Include="src\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Shaders.cpp">
+    <ClCompile Include="src\Tools.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="src\Tools.cpp">
+    <ClCompile Include="src\Geometry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ShaderBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -35,10 +38,10 @@
     <ClInclude Include="src\Header.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Shaders.h">
+    <ClInclude Include="src\Tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="src\Tools.h">
+    <ClInclude Include="src\ShaderBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

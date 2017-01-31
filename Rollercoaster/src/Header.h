@@ -3,17 +3,11 @@
 #include "Tools.h"
 
 #include <glm\glm.hpp>
+#include <vector>
 
 const float PI = 3.14159265359f,
-			PI2 = 2.f * PI,
-			floatError = 0.0001f;	//used for float rounding errors
+			twoPI = 2.f * PI;
 
 const int WINDOW_SIZE = 500;
 
-
-/*
-	Tutorial help
-
-	1) get it so we can make ou track.
-
-*/
+void generateTrackString(std::vector<glm::vec3> &vertices);

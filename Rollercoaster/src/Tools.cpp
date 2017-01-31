@@ -1,33 +1,39 @@
 #include "Tools.h"
-#include <iostream>
 
-void printVec2(glm::vec2 v)
+void printVec(glm::vec2 v)
 {
 	std::cout << v.x << "\t" << v.y << std::endl;
 }
-
-void printVec3(glm::vec3 v)
+void printVec(glm::vec3 v)
 {
-	std::cout << v.x << "\t" << v.y << "\t" << v.z <<  std::endl;
+	std::cout << v.x << "\t" << v.y << "\t" << v.z << std::endl;
 }
-
-void printVec2Array(glm::vec2 *v, int size)
+void printVecArray(glm::vec2 *v, int size)
 {
 	for (int i = 0; i < size; i++)
-		printVec2(v[i]);
+		printVec(v[i]);
 }
-
-void printVec3Array(glm::vec3 *v, int size)
+void printVecArray(glm::vec3 *v, int size)
 {
 	for (int i = 0; i < size; i++)
-		printVec3(v[i]);
+		printVec(v[i]);
+}
+void printVecVector(std::vector<glm::vec2> v)
+{
+	for (unsigned int i = 0; i < v.size(); i++)
+		printVec(v[i]);
+}
+void printVecVector(std::vector<glm::vec3> v)
+{
+	for (unsigned int i = 0; i < v.size(); i++)
+		printVec(v[i]);
 }
 
 //Rodrigues' rotation formula
-glm::vec3 rotateAboutAny(glm::vec3 vector, glm::vec3 axis, float angle)
+glm::vec3 rodriguesRotate(glm::vec3 vector, glm::vec3 axis, float angle)
 {
-	return glm::vec3((vector * cos(angle)) + 
-					(glm::cross(axis, vector) * sin(angle)) + 
-					(axis * glm::dot(axis, vector) * (1.f - cos(angle))));
+	return glm::vec3((vector * cos(angle)) +
+		(glm::cross(axis, vector) * sin(angle)) +
+		(axis * glm::dot(axis, vector) * (1.f - cos(angle))));
 }
 

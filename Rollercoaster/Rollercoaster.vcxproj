@@ -155,13 +155,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="libraries\GLAD V4.5\src\glad.c" />
+    <ClCompile Include="src\Geometry.cpp" />
     <ClCompile Include="src\Main.cpp" />
-    <ClCompile Include="src\Shaders.cpp" />
+    <ClCompile Include="src\ShaderBuilder.cpp" />
     <ClCompile Include="src\Tools.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Header.h" />
-    <ClInclude Include="src\Shaders.h" />
+    <ClInclude Include="src\ShaderBuilder.h" />
     <ClInclude Include="src\Tools.h" />
   </ItemGroup>
   <ItemGroup>
