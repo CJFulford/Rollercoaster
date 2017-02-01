@@ -28,6 +28,11 @@ void printVecVector(std::vector<glm::vec3> v)
 	for (unsigned int i = 0; i < v.size(); i++)
 		printVec(v[i]);
 }
+void printFloatVector(std::vector<float> v)
+{
+    for (unsigned int i = 0; i < v.size(); i++)
+        std::printf("%f\n", v[i]);
+}
 
 //Rodrigues' rotation formula
 glm::vec3 rodriguesRotate(glm::vec3 vector, glm::vec3 axis, float angle)
