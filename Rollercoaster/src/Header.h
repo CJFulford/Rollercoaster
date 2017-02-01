@@ -17,4 +17,5 @@ const glm::vec3 center(0.f, 0.f, 0.f),
                 up(0.f, 1.f, 0.f),
                 cam(0.f, 0.5f, 2.f);
 
-void generateTrackString(std::vector<glm::vec3> &vertices);
+void generateTrackCurve(std::vector<glm::vec3> &vertices);
+void generateTrackTangents(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &tangents);

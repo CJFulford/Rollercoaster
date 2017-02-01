@@ -1,7 +1,10 @@
 #include "Header.h"
 
-std::vector<glm::vec3> controlPoints;
-std::vector<float> knots;
+using namespace std;
+using namespace glm;
+
+vector<vec3> controlPoints;
+vector<float> knots;
 
 float deBoor_Cox(int i, int order, float u)
 {
@@ -30,7 +33,7 @@ float deBoor_Cox(int i, int order, float u)
     }
 }
 
-void bSpline(int order, std::vector<glm::vec3> &output)
+void bSpline(int order, vector<vec3> &output)
 {
     int minNumOfKnots = controlPoints.size() + order;
 
@@ -46,51 +49,58 @@ void bSpline(int order, std::vector<glm::vec3> &output)
 
     for (float u = 0.f; u < 1.f; u += 0.0001f)
     {
-        glm::vec3 point = glm::vec3(0.f, 0.f, 0.f);
+        vec3 point = vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)
             point += (controlPoints[i] * deBoor_Cox(i, order, u));
         output.push_back(point);
     }
 }
 
-void generateTrackString(std::vector<glm::vec3> &vertices)
+void generateTrackCurve(vector<vec3> &vertices)
 {
     // the chain lift and initial drop
-	controlPoints.push_back(glm::vec3(-0.75f, 0.f, 0.25f));
-	controlPoints.push_back(glm::vec3(-0.5f, 0.f, 0.25f));
-	controlPoints.push_back(glm::vec3( 0.f, 0.7f, 0.25f));
-    controlPoints.push_back(glm::vec3(0.5f, 0.f, 0.25f));
-    controlPoints.push_back(glm::vec3(0.75f, 0.f, 0.25f));
-    controlPoints.push_back(glm::vec3(0.9f, 0.f, 0.25f));
+	controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
+	controlPoints.push_back(vec3(-0.5f, 0.f, 0.25f));
+	controlPoints.push_back(vec3( 0.f, 0.7f, 0.25f));
+    controlPoints.push_back(vec3(0.5f, 0.f, 0.25f));
+    controlPoints.push_back(vec3(0.75f, 0.f, 0.25f));
+    controlPoints.push_back(vec3(0.9f, 0.f, 0.25f));
 
     // flat turn
-    controlPoints.push_back(glm::vec3(1.f, 0.f, 0.1f));
-    controlPoints.push_back(glm::vec3(1.f, 0.f, -0.025));
-    controlPoints.push_back(glm::vec3(0.9f, 0.f, -0.15f));
+    controlPoints.push_back(vec3(1.f, 0.f, 0.1f));
+    controlPoints.push_back(vec3(1.f, 0.f, -0.025));
+    controlPoints.push_back(vec3(0.9f, 0.f, -0.15f));
 
     // run up to loop
-    controlPoints.push_back(glm::vec3(0.75f, 0.f, -0.15f));
-    controlPoints.push_back(glm::vec3(0.2f, 0.f, -0.15f));
+    controlPoints.push_back(vec3(0.75f, 0.f, -0.15f));
+    controlPoints.push_back(vec3(0.2f, 0.f, -0.15f));
     
     // loop
-    controlPoints.push_back(glm::vec3(-0.2f, 0.f, -0.15f));
-    controlPoints.push_back(glm::vec3(-0.175f, 0.3f, -0.175f));
-    controlPoints.push_back(glm::vec3(0.f, 0.4f, -0.2f));
-    controlPoints.push_back(glm::vec3(0.175f, 0.3f, -0.225f));
-    controlPoints.push_back(glm::vec3(0.2f, 0.f, -0.25f));
+    controlPoints.push_back(vec3(-0.2f, 0.f, -0.15f));
+    controlPoints.push_back(vec3(-0.175f, 0.3f, -0.175f));
+    controlPoints.push_back(vec3(0.f, 0.4f, -0.2f));
+    controlPoints.push_back(vec3(0.175f, 0.3f, -0.225f));
+    controlPoints.push_back(vec3(0.2f, 0.f, -0.25f));
 
     // run away from loop
-    controlPoints.push_back(glm::vec3(-0.2f, 0.f, -0.25f));
-    controlPoints.push_back(glm::vec3(-0.75f, 0.f, -0.25f));
+    controlPoints.push_back(vec3(-0.2f, 0.f, -0.25f));
+    controlPoints.push_back(vec3(-0.75f, 0.f, -0.25f));
 
     // raised curve and join
-    controlPoints.push_back(glm::vec3(-0.9f, 0.f, -0.25f));
-    controlPoints.push_back(glm::vec3(-1.f, 0.25f, 0.f));
-    controlPoints.push_back(glm::vec3(-0.9f, 0.f, 0.25f));
-    controlPoints.push_back(glm::vec3(-0.75f, 0.f, 0.25f));
+    controlPoints.push_back(vec3(-0.9f, 0.f, -0.25f));
+    controlPoints.push_back(vec3(-1.f, 0.25f, 0.f));
+    controlPoints.push_back(vec3(-0.9f, 0.f, 0.25f));
+    controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
 
 
 
 	bSpline(3, vertices);
 }
 
+void generateTrackTangents(vector<vec3> &vertices, vector<vec3> &tangents)
+{
+    for (int i = 0; (unsigned int)i < vertices.size(); i++)
+    {
+        tangents.push_back(vertices[i - 1 % vertices.size()] - vertices[i + 1 % vertices.size()]);
+    }
+}

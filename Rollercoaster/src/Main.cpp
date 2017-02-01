@@ -12,6 +12,9 @@ double mouse_old_x,
 float rotate_x = 0.0,
     rotate_y = 0.0;
 
+GLuint vertexArray = 0;
+std::vector<glm::vec3> vertices, tangents;
+
 void errorCallback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void printOpenGLVersion();
@@ -25,6 +28,31 @@ void motion(GLFWwindow* window, double x, double y)
     }
     mouse_old_x = x;
     mouse_old_y = y;
+}
+
+void generateTrackBuffer()
+{
+    GLuint vertexBuffer, tangentBuffer;
+
+    glGenVertexArrays(1, &vertexArray);
+    glBindVertexArray(vertexArray);
+
+    generateTrackCurve(vertices);
+    generateTrackTangents(vertices, tangents);
+
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices[0]) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+
+    glGenBuffers(1, &tangentBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, tangentBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(tangents[0]) * tangents.size(), &tangents[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
 }
 
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
@@ -103,23 +131,12 @@ int main()
                                     "shaders/general.geom",
 									"shaders/general.frag");
     GLuint cartProgram = generateProgram("shaders/cart.vert",
-                                    "shaders/cart.frag");
-
-	GLuint vertexBuffer, vertexArray;
+        "shaders/cart.frag");
 
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
 
-	std::vector<glm::vec3> vertices;
-	generateTrackString(vertices);
-
-	glGenBuffers(1, &vertexBuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * vertices.size(), &vertices[0], GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-	glEnableVertexAttribArray(0);
-
-	glBindVertexArray(0);
+    generateTrackBuffer();
 
     glfwSwapInterval(1);
 
