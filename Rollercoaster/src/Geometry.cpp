@@ -44,7 +44,7 @@ void bSpline(int order, std::vector<glm::vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    for (float u = 0.f; u < 1.f; u += 0.002f)
+    for (float u = 0.f; u < 1.f; u += 0.0001f)
     {
         glm::vec3 point = glm::vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)
@@ -65,7 +65,7 @@ void generateTrackString(std::vector<glm::vec3> &vertices)
 
     // flat turn
     controlPoints.push_back(glm::vec3(1.f, 0.f, 0.1f));
-    controlPoints.push_back(glm::vec3(1.f, 0.f, -0.025f));
+    controlPoints.push_back(glm::vec3(1.f, 0.f, -0.025));
     controlPoints.push_back(glm::vec3(0.9f, 0.f, -0.15f));
 
     // run up to loop

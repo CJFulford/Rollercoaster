@@ -19,7 +19,7 @@ GLchar* loadshader(std::string filename)
 	file.open(filename.c_str(), std::ios::in);
 	if (!file)
 	{
-		std::cout << "404: " << filename.c_str() << std::endl;
+		std::cout << "FILE " << filename.c_str() << " NOT FOUND"<< std::endl;
 		return NULL;
 	}
 	unsigned long len = getFileLength(file);
@@ -78,7 +78,7 @@ void attachShader(GLuint &program, const char* fileName, GLuint shaderType)
 
 		std::cout << "\n\n" << fileName << std::endl; // show which shader has the error
 
-		fprintf(stderr, "Compilation error in shader vertex_shader: %s\n", strInfoLog);
+		fprintf(stderr, "Compilation error in shader vertex_shader: \n%s", strInfoLog);
 		delete[] strInfoLog;
 	}
 

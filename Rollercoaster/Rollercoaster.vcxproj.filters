@@ -52,5 +52,14 @@
     <None Include="shaders\general.vert">
       <Filter>Source Files\shaders</Filter>
     </None>
+    <None Include="shaders\general.geom">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\cart.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\cart.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

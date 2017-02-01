@@ -166,7 +166,10 @@
     <ClInclude Include="src\Tools.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="shaders\cart.frag" />
+    <None Include="shaders\cart.vert" />
     <None Include="shaders\general.frag" />
+    <None Include="shaders\general.geom" />
     <None Include="shaders\general.vert" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
