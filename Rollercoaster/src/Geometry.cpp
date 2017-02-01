@@ -1,4 +1,6 @@
 #include "Header.h"
+#include <fstream>
+#include <sstream>
 
 using namespace std;
 using namespace glm;
@@ -58,7 +60,44 @@ void bSpline(int order, vector<vec3> &output)
 
 void generateTrackCurve(vector<vec3> &vertices)
 {
-    // the chain lift and initial drop
+
+    ifstream fileStream("controlPoints.txt");
+
+    std::string line;
+    while (std::getline(fileStream, line))
+    {
+        if (line[0] == '/' || line[0] == '\n') continue;
+
+        float x, y, z;
+        std::string a, b, c;
+
+        a = line.substr(0, line.find_first_of(' '));
+
+        line = line.substr(line.find_first_of(' '));
+        line = line.substr(line.find_first_not_of(' '));
+
+        b = line.substr(0, line.find_first_of(' '));
+
+        line = line.substr(line.find_first_of(' '));
+        line = line.substr(line.find_first_not_of(' '));
+
+        c = line.substr(0, line.find_first_of(' '));
+
+        x = stof(a);
+        y = stof(b);
+        z = stof(c);
+
+        controlPoints.push_back(vec3(x, y, z));
+
+
+    }
+
+    fileStream.close();
+
+
+
+
+    /*// the chain lift and initial drop
 	controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
 	controlPoints.push_back(vec3(-0.5f, 0.f, 0.25f));
 	controlPoints.push_back(vec3( 0.f, 0.7f, 0.25f));
@@ -91,7 +130,7 @@ void generateTrackCurve(vector<vec3> &vertices)
     controlPoints.push_back(vec3(-1.f, 0.25f, 0.f));
     controlPoints.push_back(vec3(-0.9f, 0.f, 0.25f));
     controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
-
+    */
 
 
 	bSpline(3, vertices);

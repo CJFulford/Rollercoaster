@@ -31,25 +31,25 @@ float width = 0.01f;
 
 void main (void)
 {	
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(halfPI) * 0.1f * normalize(tang[0])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(halfPI) * normalize(tang[0])), 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * 0.1f * normalize(tang[0])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * tang[0]), 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * 0.1f * normalize(tang[1])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * tang[1]), 1.f);
     EmitVertex();
 
     EndPrimitive();
 
 
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * 0.1f * normalize(tang[0])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * tang[0]), 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * 0.1f * normalize(tang[1])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * tang[1]), 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(-halfPI) * 0.1f * normalize(tang[1])), 1.f);
+    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(-halfPI) * tang[1]), 1.f);
     EmitVertex();
 
     EndPrimitive();

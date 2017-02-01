@@ -12,7 +12,7 @@ double mouse_old_x,
 float rotate_x = 0.0,
     rotate_y = 0.0;
 
-GLuint vertexArray = 0;
+GLuint vertexArray = 0, trackProgram, cartProgram;
 std::vector<glm::vec3> vertices, tangents;
 
 void errorCallback(int error, const char* description);
@@ -53,6 +53,15 @@ void generateTrackBuffer()
     glEnableVertexAttribArray(1);
 
     glBindVertexArray(0);
+}
+
+void generateShaders()
+{
+    trackProgram = generateProgram(  "shaders/general.vert",
+                                            "shaders/general.geom",
+                                            "shaders/general.frag");
+    cartProgram = generateProgram(   "shaders/cart.vert",
+                                            "shaders/cart.frag");
 }
 
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
@@ -127,11 +136,7 @@ int main()
 	}
 	printOpenGLVersion();
 
-	GLuint trackProgram = generateProgram("shaders/general.vert",
-                                    "shaders/general.geom",
-									"shaders/general.frag");
-    GLuint cartProgram = generateProgram("shaders/cart.vert",
-        "shaders/cart.frag");
+    generateShaders();
 
 	glGenVertexArrays(1, &vertexArray);
 	glBindVertexArray(vertexArray);
@@ -168,8 +173,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		switch (key)
 		{
-		case(GLFW_KEY_W):
-			std::cout << "W" << std::endl;
+		case(GLFW_KEY_S):
+			std::cout << "Recompiling Shaders... ";
+            generateShaders();
+            std::cout << "Done" << std::endl;
 			break;
 		default:
 			break;
