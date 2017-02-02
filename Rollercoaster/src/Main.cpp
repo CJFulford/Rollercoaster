@@ -7,9 +7,11 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <iostream>
 
-#define minEnergy 200
-#define cartMass 400
-float maxEnergy = 0.f, maxHeight = 0.f;
+#define minEnergy 100   // min kinetic energy is 100J
+#define cartMass 200    // mass of the cart is 200Kg
+float maxEnergy = 0.f, 
+        maxHeight = 0.f, // max height of track. Top of chain. currently 10m
+        zoom = 10.f;
 
 double mouse_old_x, 
     mouse_old_y;
@@ -21,6 +23,7 @@ std::vector<glm::vec3> vertices, tangents;
 
 void errorCallback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
 void printOpenGLVersion();
 
 void motion(GLFWwindow* window, double x, double y)
@@ -70,7 +73,7 @@ void generateShaders()
 
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 {
-    glm::mat4   modelview = glm::lookAt(cam, center, up),
+    glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
                 projection = glm::perspective(45.0f, 1.f, 0.01f, 100.0f),
                 rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
                 rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
@@ -90,7 +93,7 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 
 void renderCart(GLuint program, GLuint vertexArray, int position)
 {
-    glm::mat4   modelview = glm::lookAt(cam, center, up),
+    glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
                 projection = glm::perspective(45.0f, 1.f, 0.01f, 100.0f),
                 rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
                 rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
@@ -111,9 +114,8 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
 
 float calculateSpeed(float height)
 {
-    //1/2 mv^2 = mgh
-    float eK = maxEnergy - (cartMass * gravity * height);
-    return sqrt(2.f * eK / cartMass);
+    float eK = maxEnergy - (cartMass * gravity * height);   // total energy - eP = eK
+    return sqrt(eK * 2.f / cartMass); // convert eK into velocity
 }
 
 int main()
@@ -138,6 +140,7 @@ int main()
 	}
 	glfwSetKeyCallback(window, key_callback);
     glfwSetCursorPosCallback(window, motion);
+    glfwSetScrollCallback(window, scroll_callback);
 	glfwMakeContextCurrent(window);
 
 	if (!gladLoadGL())
@@ -153,7 +156,7 @@ int main()
 
     glfwSwapInterval(1);
 
-    maxEnergy = (cartMass * gravity * maxHeight) + minEnergy;
+    maxEnergy = (cartMass * gravity * maxHeight) + minEnergy;   // initial eK + max eP
     int position = 0;
 
 	while (!glfwWindowShouldClose(window))
@@ -165,6 +168,7 @@ int main()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
         std::cout << calculateSpeed(vertices[position].y) << std::endl;
         position = (int)(position + calculateSpeed(vertices[position].y)) % vertices.size();
 	}
@@ -191,6 +195,14 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			break;
 		}
 	}
+}
+
+void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
+{
+    if (yoffset < 0)
+        zoom += 0.1f;
+    else if (yoffset > 0)
+        zoom -= 0.1f;
 }
 
 void printOpenGLVersion()

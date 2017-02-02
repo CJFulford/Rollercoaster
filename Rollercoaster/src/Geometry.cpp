@@ -37,8 +37,9 @@ float deBoor_Cox(int i, int order, float u)
     }
 }
 
-void bSpline(int order, vector<vec3> &output)
+float bSpline(int order, vector<vec3> &output)
 {
+    float maxHeight = 0.f;
     int minNumOfKnots = controlPoints.size() + order;
 
     for (int i = 0; i < 1.f * minNumOfKnots; i++)
@@ -51,7 +52,7 @@ void bSpline(int order, vector<vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    float dist = 0.002f;
+    float dist = 0.01f;
 
     for (float u = 0.f; u < 1.f; u += 0.00005f)
     {
@@ -60,15 +61,21 @@ void bSpline(int order, vector<vec3> &output)
             point += (controlPoints[i] * deBoor_Cox(i, order, u));
 
         if (u == 0.f)
+        {
             output.push_back(point);
+            maxHeight = max(maxHeight, point.y);
+        }
         if (distance(output.back(), point) > dist)
+        {
             output.push_back(point);
+            maxHeight = max(maxHeight, point.y);
+        }
     }
+    return maxHeight;
 }
 
 float generateTrackCurve(vector<vec3> &vertices)
 {
-    float maxHeight = 0.f;
     ifstream fileStream("src/controlPoints.txt");
 
     if (!fileStream.is_open()) cout << "Failed to open control point file" << endl;
@@ -93,17 +100,14 @@ float generateTrackCurve(vector<vec3> &vertices)
         c = line.substr(0, line.find_first_of(' '));
 
         float height = stof(b);
+
         controlPoints.push_back(vec3(stof(a), height, stof(c)));
-
-        maxHeight = max(maxHeight, height);
-
     }
 
     fileStream.close();
 
-	bSpline(trackOrder, vertices);
+	return bSpline(trackOrder, vertices);
 
-    return maxHeight;
 }
 
 void generateTrackTangents(vector<vec3> &vertices, vector<vec3> &tangents)
