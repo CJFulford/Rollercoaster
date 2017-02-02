@@ -7,6 +7,10 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <iostream>
 
+#define minEnergy 200
+#define cartMass 400
+float maxEnergy = 0.f, maxHeight = 0.f;
+
 double mouse_old_x, 
     mouse_old_y;
 float rotate_x = 0.0,
@@ -37,7 +41,7 @@ void generateTrackBuffer()
     glGenVertexArrays(1, &vertexArray);
     glBindVertexArray(vertexArray);
 
-    generateTrackCurve(vertices);
+    maxHeight = generateTrackCurve(vertices);
     generateTrackTangents(vertices, tangents);
 
     glGenBuffers(1, &vertexBuffer);
@@ -57,11 +61,11 @@ void generateTrackBuffer()
 
 void generateShaders()
 {
-    trackProgram = generateProgram(  "shaders/general.vert",
-                                            "shaders/general.geom",
-                                            "shaders/general.frag");
-    cartProgram = generateProgram(   "shaders/cart.vert",
-                                            "shaders/cart.frag");
+    trackProgram = generateProgram( "shaders/general.vert",
+                                    "shaders/general.geom",
+                                    "shaders/general.frag");
+    cartProgram = generateProgram(  "shaders/cart.vert",
+                                    "shaders/cart.frag");
 }
 
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
@@ -105,6 +109,13 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
     glBindVertexArray(0);
 }
 
+float calculateSpeed(float height)
+{
+    //1/2 mv^2 = mgh
+    float eK = maxEnergy - (cartMass * gravity * height);
+    return sqrt(2.f * eK / cartMass);
+}
+
 int main()
 {
 	if (!glfwInit())
@@ -138,13 +149,11 @@ int main()
 
     generateShaders();
 
-	glGenVertexArrays(1, &vertexArray);
-	glBindVertexArray(vertexArray);
-
     generateTrackBuffer();
 
     glfwSwapInterval(1);
 
+    maxEnergy = (cartMass * gravity * maxHeight) + minEnergy;
     int position = 0;
 
 	while (!glfwWindowShouldClose(window))
@@ -156,8 +165,8 @@ int main()
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
-
-        position = (position + 1) % vertices.size();
+        std::cout << calculateSpeed(vertices[position].y) << std::endl;
+        position = (int)(position + calculateSpeed(vertices[position].y)) % vertices.size();
 	}
 
 

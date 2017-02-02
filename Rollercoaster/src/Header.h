@@ -7,7 +7,8 @@
 
 const float PI = 3.14159265359f,
             twoPI = 2.f * PI,
-            halfPI = PI / 2.f;
+            halfPI = PI / 2.f,
+            gravity = 9.81f;
 
 const int WINDOW_SIZE = 500;
 
@@ -17,5 +18,5 @@ const glm::vec3 center(0.f, 0.f, 0.f),
                 up(0.f, 1.f, 0.f),
                 cam(0.f, 0.5f, 2.f);
 
-void generateTrackCurve(std::vector<glm::vec3> &vertices);
+float generateTrackCurve(std::vector<glm::vec3> &vertices);
 void generateTrackTangents(std::vector<glm::vec3> &vertices, std::vector<glm::vec3> &tangents);

@@ -62,4 +62,9 @@
       <Filter>Source Files\shaders</Filter>
     </None>
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="src\controlPoints.txt">
+      <Filter>Source Files</Filter>
+    </Text>
+  </ItemGroup>
 </Project>

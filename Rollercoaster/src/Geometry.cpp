@@ -2,6 +2,8 @@
 #include <fstream>
 #include <sstream>
 
+#define trackOrder 6
+
 using namespace std;
 using namespace glm;
 
@@ -39,7 +41,7 @@ void bSpline(int order, vector<vec3> &output)
 {
     int minNumOfKnots = controlPoints.size() + order;
 
-    for (int i = 0; i < minNumOfKnots; i++)
+    for (int i = 0; i < 1.f * minNumOfKnots; i++)
     {
         if (i < order)
             knots.push_back(0.f);
@@ -49,26 +51,33 @@ void bSpline(int order, vector<vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    for (float u = 0.f; u < 1.f; u += 0.0001f)
+    float dist = 0.002f;
+
+    for (float u = 0.f; u < 1.f; u += 0.00005f)
     {
         vec3 point = vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)
             point += (controlPoints[i] * deBoor_Cox(i, order, u));
-        output.push_back(point);
+
+        if (u == 0.f)
+            output.push_back(point);
+        if (distance(output.back(), point) > dist)
+            output.push_back(point);
     }
 }
 
-void generateTrackCurve(vector<vec3> &vertices)
+float generateTrackCurve(vector<vec3> &vertices)
 {
+    float maxHeight = 0.f;
+    ifstream fileStream("src/controlPoints.txt");
 
-    ifstream fileStream("controlPoints.txt");
+    if (!fileStream.is_open()) cout << "Failed to open control point file" << endl;
 
     std::string line;
     while (std::getline(fileStream, line))
     {
-        if (line[0] == '/' || line[0] == '\n') continue;
+        if (line[0] == '/' || line.empty()) continue;
 
-        float x, y, z;
         std::string a, b, c;
 
         a = line.substr(0, line.find_first_of(' '));
@@ -83,63 +92,22 @@ void generateTrackCurve(vector<vec3> &vertices)
 
         c = line.substr(0, line.find_first_of(' '));
 
-        x = stof(a);
-        y = stof(b);
-        z = stof(c);
+        float height = stof(b);
+        controlPoints.push_back(vec3(stof(a), height, stof(c)));
 
-        controlPoints.push_back(vec3(x, y, z));
-
+        maxHeight = max(maxHeight, height);
 
     }
 
     fileStream.close();
 
+	bSpline(trackOrder, vertices);
 
-
-
-    /*// the chain lift and initial drop
-	controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
-	controlPoints.push_back(vec3(-0.5f, 0.f, 0.25f));
-	controlPoints.push_back(vec3( 0.f, 0.7f, 0.25f));
-    controlPoints.push_back(vec3(0.5f, 0.f, 0.25f));
-    controlPoints.push_back(vec3(0.75f, 0.f, 0.25f));
-    controlPoints.push_back(vec3(0.9f, 0.f, 0.25f));
-
-    // flat turn
-    controlPoints.push_back(vec3(1.f, 0.f, 0.1f));
-    controlPoints.push_back(vec3(1.f, 0.f, -0.025));
-    controlPoints.push_back(vec3(0.9f, 0.f, -0.15f));
-
-    // run up to loop
-    controlPoints.push_back(vec3(0.75f, 0.f, -0.15f));
-    controlPoints.push_back(vec3(0.2f, 0.f, -0.15f));
-    
-    // loop
-    controlPoints.push_back(vec3(-0.2f, 0.f, -0.15f));
-    controlPoints.push_back(vec3(-0.175f, 0.3f, -0.175f));
-    controlPoints.push_back(vec3(0.f, 0.4f, -0.2f));
-    controlPoints.push_back(vec3(0.175f, 0.3f, -0.225f));
-    controlPoints.push_back(vec3(0.2f, 0.f, -0.25f));
-
-    // run away from loop
-    controlPoints.push_back(vec3(-0.2f, 0.f, -0.25f));
-    controlPoints.push_back(vec3(-0.75f, 0.f, -0.25f));
-
-    // raised curve and join
-    controlPoints.push_back(vec3(-0.9f, 0.f, -0.25f));
-    controlPoints.push_back(vec3(-1.f, 0.25f, 0.f));
-    controlPoints.push_back(vec3(-0.9f, 0.f, 0.25f));
-    controlPoints.push_back(vec3(-0.75f, 0.f, 0.25f));
-    */
-
-
-	bSpline(3, vertices);
+    return maxHeight;
 }
 
 void generateTrackTangents(vector<vec3> &vertices, vector<vec3> &tangents)
 {
     for (int i = 0; (unsigned int)i < vertices.size(); i++)
-    {
-        tangents.push_back(vertices[i - 1 % vertices.size()] - vertices[i + 1 % vertices.size()]);
-    }
+        tangents.push_back(vertices[(i + 1) % vertices.size()] - vertices[i]);
 }

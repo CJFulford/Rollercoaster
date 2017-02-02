@@ -1,7 +1,7 @@
 #version 430 core
 
 layout(lines) in;
-layout(triangle_Strip, max_vertices = 6) out;
+layout(line_strip, max_vertices = 4) out;
 
 
 uniform mat4 modelview;
@@ -30,27 +30,20 @@ mat3 rotateZ(float a){return mat3(cos(a), -sin(a), 0.f, sin(a), cos(a), 0.f, 0.f
 float width = 0.01f;
 
 void main (void)
-{	
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(halfPI) * normalize(tang[0])), 1.f);
+{	gl_Position = projection * modelview * vec4(vert[0], 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * tang[0]), 1.f);
+    //gl_Position = projection * modelview * vec4(vert[0] + 0.1f * normalize( tang[0]), 1.f);
+    //EmitVertex();
+
+    //EndPrimitive();
+
+
+    gl_Position = projection * modelview * vec4(vert[1], 1.f);
     EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * tang[1]), 1.f);
-    EmitVertex();
-
-    EndPrimitive();
-
-
-    gl_Position = projection * modelview * vec4(vert[0] + (rotateY(-halfPI) * tang[0]), 1.f);
-    EmitVertex();
-
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(halfPI) * tang[1]), 1.f);
-    EmitVertex();
-
-    gl_Position = projection * modelview * vec4(vert[1] + (rotateY(-halfPI) * tang[1]), 1.f);
-    EmitVertex();
+    //gl_Position = projection * modelview * vec4(vert[1] + 0.1f * normalize(tang[1]), 1.f);
+    //EmitVertex();
 
     EndPrimitive();
 }

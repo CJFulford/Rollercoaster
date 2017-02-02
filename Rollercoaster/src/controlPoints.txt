@@ -1,19 +1,19 @@
 // the chain lift and initial drop
--0.75f  0.f    0.25f
--0.5f   0.f    0.25f
- 0.f    0.7f   0.25f
-0.5f    0.f    0.25f
-0.75f   0.f    0.25f
-0.9f    0.f    0.25f
+-0.75f  0.f     0.25f
+-0.5f   0.f     0.25f
+0.f     1.f     0.25f
+0.5f    0.f     0.25f
+0.75f   0.f     0.25f
+0.9f    0.f     0.25f
 
 // flat turn
-1.f     0.f    0.1f
-1.f     0.f    -0.025
-0.9f    0.f    -0.15f
+1.f     0.f     0.1f
+1.f     0.f     -0.025
+0.9f    0.f     -0.15f
 
 // run up to loop
-0.75f   0.f    -0.15f
-0.2f    0.f    -0.15f
+0.75f   0.f     -0.15f
+0.2f    0.f     -0.15f
 
 // loop
 -0.2f   0.f     -0.15f
