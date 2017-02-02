@@ -45,6 +45,16 @@ void main (void)
     EmitVertex();
 
     EndPrimitive();
+
+    /*
+
+    // if the angle between that tangents is within a certain range, the angle of he track will be 0
+
+    */
+
+
+
+
 }
 
 

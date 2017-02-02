@@ -1,6 +1,7 @@
 #include "Header.h"
 #include <fstream>
 #include <sstream>
+#include <omp.h>
 
 
 #define trackOrder 8 // silky smooth
@@ -63,7 +64,7 @@ float bSpline(int order, vector<vec3> &output)
 
         if (u == 0.f)
         {
-            output.push_back(point);
+            output.push_back(point);    
             maxHeight = max(maxHeight, point.y);
         }
         if (distance(output.back(), point) > dist)
