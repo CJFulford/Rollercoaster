@@ -10,7 +10,10 @@ const float PI = 3.14159265359f,
             halfPI = PI / 2.f,
             gravity = 9.81f;
 
-const int WINDOW_SIZE = 500;
+const int WINDOW_WIDTH = 700,
+            WINDOW_HEIGHT = 500;
+
+const float ASPECT_RATIO = (float)WINDOW_WIDTH / (float)WINDOW_HEIGHT;
 
 const glm::mat4 identity(1.0f);
 

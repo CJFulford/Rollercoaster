@@ -2,7 +2,8 @@
 #include <fstream>
 #include <sstream>
 
-#define trackOrder 6
+
+#define trackOrder 8 // silky smooth
 
 using namespace std;
 using namespace glm;
@@ -22,7 +23,7 @@ float deBoor_Cox(int i, int order, float u)
         float ratio1 = 0.f, ratio2 = 0.f;
 
         // if denominator of the ratios is zero, leave that side of the equation as 0
-        if (knots[i + order - 1] - knots[i] >= 0.0001f)
+        if (knots[i + order - 1] - knots[i] != 0.f)
         {
             ratio1 = (u - knots[i]) / (knots[i + order - 1] - knots[i]);
             ratio1 *= deBoor_Cox(i, order - 1, u);
@@ -52,9 +53,9 @@ float bSpline(int order, vector<vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    float dist = 0.01f;
+    float dist = 0.05f;
 
-    for (float u = 0.f; u < 1.f; u += 0.00005f)
+    for (float u = 0.f; u < 1.f; u += 0.00001f)
     {
         vec3 point = vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)
@@ -71,6 +72,9 @@ float bSpline(int order, vector<vec3> &output)
             maxHeight = max(maxHeight, point.y);
         }
     }
+    output.push_back(output[0]);
+
+    
     return maxHeight;
 }
 
@@ -99,9 +103,7 @@ float generateTrackCurve(vector<vec3> &vertices)
 
         c = line.substr(0, line.find_first_of(' '));
 
-        float height = stof(b);
-
-        controlPoints.push_back(vec3(stof(a), height, stof(c)));
+        controlPoints.push_back(vec3(stof(a), stof(b), stof(c)));
     }
 
     fileStream.close();
@@ -112,6 +114,7 @@ float generateTrackCurve(vector<vec3> &vertices)
 
 void generateTrackTangents(vector<vec3> &vertices, vector<vec3> &tangents)
 {
+    tangents.push_back(vertices.front() - vertices.back());
     for (int i = 0; (unsigned int)i < vertices.size(); i++)
         tangents.push_back(vertices[(i + 1) % vertices.size()] - vertices[i]);
 }

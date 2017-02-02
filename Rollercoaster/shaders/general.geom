@@ -27,23 +27,22 @@ mat3 rotateX(float a){return mat3(1.f, 0.f, 0.f, 0.f, cos(a), -sin(a), 0.f, sin(
 mat3 rotateY(float a){return mat3(cos(a), 0.f, sin(a), 0.f, 1.f, 0.f, -sin(a), 0.f, cos(a));}
 mat3 rotateZ(float a){return mat3(cos(a), -sin(a), 0.f, sin(a), cos(a), 0.f, 0.f, 0.f, 1.0);}
 
-float width = 0.01f;
-
 void main (void)
 {	gl_Position = projection * modelview * vec4(vert[0], 1.f);
     EmitVertex();
 
-    //gl_Position = projection * modelview * vec4(vert[0] + 0.1f * normalize( tang[0]), 1.f);
-    //EmitVertex();
-
-    //EndPrimitive();
-
-
     gl_Position = projection * modelview * vec4(vert[1], 1.f);
     EmitVertex();
+    
+    EndPrimitive();
 
-    //gl_Position = projection * modelview * vec4(vert[1] + 0.1f * normalize(tang[1]), 1.f);
-    //EmitVertex();
+
+
+    gl_Position = projection * modelview * vec4(vert[0] + normalize(tang[0]), 1.f);
+    EmitVertex();
+
+    gl_Position = projection * modelview * vec4(vert[1] + normalize(tang[1]), 1.f);
+    EmitVertex();
 
     EndPrimitive();
 }

@@ -7,9 +7,9 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <iostream>
 
-#define minEnergy 100   // min kinetic energy is 100J
+#define constEnergy 100   // min kinetic energy is 100J
 #define cartMass 200    // mass of the cart is 200Kg
-float maxEnergy = 0.f, 
+float totalEnergy = 0.f,
         maxHeight = 0.f, // max height of track. Top of chain. currently 10m
         zoom = 10.f;
 
@@ -74,7 +74,7 @@ void generateShaders()
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 {
     glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
-                projection = glm::perspective(45.0f, 1.f, 0.01f, 100.0f),
+                projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
                 rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
                 rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
 
@@ -82,6 +82,8 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 
     glBindVertexArray(vertexArray);
     glUseProgram(program);
+
+    glPointSize(1);
 
     glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
@@ -94,7 +96,7 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 void renderCart(GLuint program, GLuint vertexArray, int position)
 {
     glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
-                projection = glm::perspective(45.0f, 1.f, 0.01f, 100.0f),
+                projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
                 rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
                 rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
 
@@ -114,7 +116,7 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
 
 float calculateSpeed(float height)
 {
-    float eK = maxEnergy - (cartMass * gravity * height);   // total energy - eP = eK
+    float eK = totalEnergy - (cartMass * gravity * height);   // total energy - eP = eK
     return sqrt(eK * 2.f / cartMass); // convert eK into velocity
 }
 
@@ -131,7 +133,7 @@ int main()
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
 	glfwWindowHint(GLFW_SAMPLES, 32);
 
-	GLFWwindow* window = glfwCreateWindow(WINDOW_SIZE, WINDOW_SIZE, "Rollercoaster", NULL, NULL);
+	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rollercoaster", NULL, NULL);
 
 	if (!window) {
 		std::cout << "Failed to create window" << std::endl;
@@ -156,7 +158,7 @@ int main()
 
     glfwSwapInterval(1);
 
-    maxEnergy = (cartMass * gravity * maxHeight) + minEnergy;   // initial eK + max eP
+    totalEnergy = (cartMass * gravity * maxHeight) + constEnergy;   // initial eK + max eP
     int position = 0;
 
 	while (!glfwWindowShouldClose(window))
@@ -169,7 +171,6 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-        std::cout << calculateSpeed(vertices[position].y) << std::endl;
         position = (int)(position + calculateSpeed(vertices[position].y)) % vertices.size();
 	}
 
