@@ -21,6 +21,8 @@ float rotate_x = 0.0,
 GLuint vertexArray = 0, trackProgram, cartProgram;
 std::vector<glm::vec3> vertices, tangents;
 
+glm::vec3 center(0.f, 0.f, 0.f);
+
 void errorCallback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
@@ -71,22 +73,28 @@ void generateShaders()
                                     "shaders/cart.frag");
 }
 
-void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
+void passBasicUniforms(GLuint program)
 {
     glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
-                projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
-                rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
-                rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
+        projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
+        rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
+        rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
 
     modelview *= rotationY;
+
+    glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
+    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
+}
+
+void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
+{
 
     glBindVertexArray(vertexArray);
     glUseProgram(program);
 
-    glPointSize(1);
+    passBasicUniforms(program);
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
-    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
+    glPointSize(1);
 
     glDrawArrays(GL_LINE_STRIP, 0, numVertiecs);
 
@@ -95,18 +103,10 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 
 void renderCart(GLuint program, GLuint vertexArray, int position)
 {
-    glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
-                projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
-                rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
-                rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
-
-    modelview *= rotationY;
-
     glBindVertexArray(vertexArray);
     glUseProgram(program);
 
-    glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
-    glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
+    passBasicUniforms(program);
     
     glPointSize(10);
     glDrawArrays(GL_POINTS, position, 1);
@@ -187,11 +187,24 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 	{
 		switch (key)
 		{
-		case(GLFW_KEY_S):
+		case(GLFW_KEY_N):
 			std::cout << "Recompiling Shaders... ";
             generateShaders();
             std::cout << "Done" << std::endl;
 			break;
+        case(GLFW_KEY_A):
+            center.x -= 1.f;
+            break;
+        case(GLFW_KEY_D):
+            center.x += 1.f;
+            break;
+        case(GLFW_KEY_S):
+            center.y -= 1.f;
+            break;
+        case(GLFW_KEY_W):
+            center.y += 1.f;
+            break;
+
 		default:
 			break;
 		}
