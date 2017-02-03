@@ -1,7 +1,7 @@
 #version 430 core
 
 layout(lines) in;
-layout(line_strip, max_vertices = 4) out;
+layout(points, max_vertices = 4) out;
 
 
 uniform mat4 modelview;
@@ -31,6 +31,8 @@ void main (void)
 {	gl_Position = projection * modelview * vec4(vert[0], 1.f);
     EmitVertex();
 
+    EndPrimitive();
+
     gl_Position = projection * modelview * vec4(vert[1], 1.f);
     EmitVertex();
     
@@ -38,11 +40,11 @@ void main (void)
 
 
 
-    gl_Position = projection * modelview * vec4(vert[0] + normalize(tang[0]), 1.f);
-    EmitVertex();
+    //gl_Position = projection * modelview * vec4(vert[0] + normalize(tang[0]), 1.f);
+    //EmitVertex();
 
-    gl_Position = projection * modelview * vec4(vert[1] + normalize(tang[1]), 1.f);
-    EmitVertex();
+    //gl_Position = projection * modelview * vec4(vert[1] + normalize(tang[1]), 1.f);
+    //EmitVertex();
 
     EndPrimitive();
 
