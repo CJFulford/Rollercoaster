@@ -13,8 +13,11 @@ out vec3 norm;
 
 void main (void)
 {
-    vert = vertex;
+    vec3 v = vertex;
+    v += 0.01f * normal; // raise the carts off of the tracks
+
+    vert = v;
     tang = tangent;
     norm = normal;
-    gl_Position = vec4(vertex, 1.f);
+    gl_Position = vec4(v, 1.f);
 }

@@ -41,8 +41,8 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     
     vec3 vertex = v;
     vec3 tangent = cartLength * normalize(t);
-    vec3 normal = cartHeight * normalize(n);
-    vec3 perpendicular = trackWidth * normalize(cross(tangent, normal));
+    vec3 perpendicular = trackWidth * normalize(cross(tangent, normalize(n)));
+    vec3 normal = cartHeight * normalize(cross(perpendicular, tangent));
     
     // ============================================ outer wall
     gl_Position = toOutput(vertex + perpendicular - tangent);
@@ -132,7 +132,7 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
 
 void main (void)
 {
-    pointToBox(vert[0], tang[0], norm[0], cartHeightScale, cartLengthScale);
+    pointToBox(vert[0] + 0.1f * norm[0], tang[0], norm[0], cartHeightScale, cartLengthScale);
 }
 
 

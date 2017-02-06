@@ -11,15 +11,22 @@ float totalEnergy = 0.f,
         maxHeight = 0.f, // max height of track. Top of chain. currently 10m
         zoom = 10.f;
 
+bool cartCamera = false;
+
 double mouse_old_x, 
     mouse_old_y;
 float rotate_x = 0.0,
     rotate_y = 0.0;
 
-GLuint vertexArray = 0, trackProgram, cartProgram;
+const GLfloat clearColor[] = { 0.3f, 0.6f, 1.f };
+glm::vec3 up(0.f, 1.f, 0.f),
+          cam(0.f, 0.5f, 2.f),
+          center(0.f, 5.f, 0.f);
+
+
+GLuint trackVertexArray = 0, groundVertexArray = 0, trackProgram, cartProgram, groundProgram;
 std::vector<glm::vec3> vertices, tangents, normals;
 
-glm::vec3 center(0.f, 5.f, 0.f);
 
 void errorCallback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
@@ -31,8 +38,8 @@ void generateTrackBuffer()
 {
     GLuint vertexBuffer = 0, tangentBuffer = 0, normalBuffer = 0;
 
-    glGenVertexArrays(1, &vertexArray);
-    glBindVertexArray(vertexArray);
+    glGenVertexArrays(1, &trackVertexArray);
+    glBindVertexArray(trackVertexArray);
 
     maxHeight = generateTrackCurve(vertices);
     generateTrackTangents(vertices, tangents);
@@ -59,6 +66,29 @@ void generateTrackBuffer()
     glBindVertexArray(0);
 }
 
+void generateGroundBuffer()
+{
+    GLuint vertexBuffer = 0;
+
+    glGenVertexArrays(1, &groundVertexArray);
+    glBindVertexArray(groundVertexArray);
+
+    std::vector<glm::vec3> groundVerts;
+
+    groundVerts.push_back(glm::vec3(-200.f, -0.1f, -200.f));
+    groundVerts.push_back(glm::vec3(-200.f, -0.1f, 200.f));
+    groundVerts.push_back(glm::vec3(200.f, -0.1f, -200.f));
+    groundVerts.push_back(glm::vec3(200.f, -0.1f, 200.f));
+
+    glGenBuffers(1, &vertexBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(groundVerts[0]) * groundVerts.size(), &groundVerts[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(0);
+
+    glBindVertexArray(0);
+}
+
 void generateShaders()
 {
     trackProgram = generateProgram( "shaders/track.vert",
@@ -67,16 +97,22 @@ void generateShaders()
     cartProgram = generateProgram(  "shaders/cart.vert",
                                     "shaders/cart.geom",
                                     "shaders/cart.frag");
+    groundProgram = generateProgram("shaders/general.vert",
+                                    "shaders/general.frag");
 }
 
 void passBasicUniforms(GLuint program)
 {
     glm::mat4   modelview = glm::lookAt(cam * zoom, center, up),
-        projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f),
-        rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
-        rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
+        projection = glm::perspective(45.0f, ASPECT_RATIO, 0.01f, 100.0f);
 
-    modelview *= rotationY;
+    if (!cartCamera)
+    {
+        glm::mat4   rotationX = rotate(identity, rotate_x  * PI / 180.0f, glm::vec3(1.f, 0.f, 0.f)),
+            rotationY = rotate(rotationX, rotate_y  * PI / 180.0f, glm::vec3(0.f, 1.f, 0.f));
+
+        modelview *= rotationY;
+    }
 
     glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
@@ -88,9 +124,11 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
     glBindVertexArray(vertexArray);
     glUseProgram(program);
 
+    glLineWidth(3);
+
     passBasicUniforms(program);
 
-    glDrawArrays(GL_LINE_STRIP, 0, numVertiecs);
+    glDrawArrays(GL_LINE_LOOP, 0, numVertiecs);
 
     glBindVertexArray(0);
 }
@@ -101,8 +139,27 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
     glUseProgram(program);
 
     passBasicUniforms(program);
-    
-    glDrawArrays(GL_POINTS, position, 1);
+
+    for (int i = 0; i < numOfCarts; i++)
+    {
+        int pos = (position - (8 * i)) % (int)(vertices.size());
+        if (pos >= 0)
+            glDrawArrays(GL_POINTS, pos, 1);
+        else
+            glDrawArrays(GL_POINTS, ((int)vertices.size()) + pos, 1);
+    }
+
+    glBindVertexArray(0);
+}
+
+void renderGround(GLuint program)
+{
+    glBindVertexArray(groundVertexArray);
+    glUseProgram(program);
+
+    passBasicUniforms(program);
+
+    glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
     glBindVertexArray(0);
 }
@@ -149,6 +206,7 @@ int main()
     generateShaders();
 
     generateTrackBuffer();
+    generateGroundBuffer();
 
     glfwSwapInterval(3);
 
@@ -157,11 +215,28 @@ int main()
 
 	while (!glfwWindowShouldClose(window))
 	{
+        glEnable(GL_DEPTH_TEST);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearBufferfv(GL_COLOR, 0, clearColor);
 
-        renderTrack(trackProgram, vertexArray, vertices.size());
-        renderCart(cartProgram, vertexArray, position);
 
+        if (cartCamera)
+        {
+            float personHeight = 0.5f;
+            zoom = 1.f;
+            cam = vertices[position] + personHeight * normals[position];
+            up = normals[position];
+            center = vertices[position] + tangents[position] + personHeight * normals[position];
+
+        }
+
+
+        renderGround(groundProgram);
+
+        renderTrack(trackProgram, trackVertexArray, vertices.size());
+        renderCart(cartProgram, trackVertexArray, position);
+
+        glDisable(GL_DEPTH_TEST);
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
@@ -205,7 +280,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
         case(GLFW_KEY_W):
             center.y += 1.f;
             break;
-
+        case(GLFW_KEY_C):
+            cartCamera = !cartCamera;
+            if (!cartCamera)
+            {
+                zoom = defaultZoom;
+                cam = defaultCam;
+                up = defaultUp;
+                center = defaultCenter;
+            }
+            break;
 		default:
 			break;
 		}
@@ -214,21 +298,26 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
-    if (yoffset < 0)
-        zoom += 0.1f;
-    else if (yoffset > 0)
-        zoom -= 0.1f;
+    if (!cartCamera)
+    {
+        if (yoffset < 0)
+            zoom += 0.1f;
+        else if (yoffset > 0)
+            zoom -= 0.1f;
+    }
 }
 
 void motion(GLFWwindow* window, double x, double y)
 {
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
-    {
-        rotate_x += (float)((y - mouse_old_y) * 0.5f);
-        rotate_y += (float)((x - mouse_old_x) * 0.5f);
+    if (!cartCamera) {
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+        {
+            rotate_x += (float)((y - mouse_old_y) * 0.5f);
+            rotate_y += (float)((x - mouse_old_x) * 0.5f);
+        }
+        mouse_old_x = x;
+        mouse_old_y = y;
     }
-    mouse_old_x = x;
-    mouse_old_y = y;
 }
 
 void printOpenGLVersion()

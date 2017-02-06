@@ -177,6 +177,8 @@
     <None Include="shaders\cart.frag" />
     <None Include="shaders\cart.geom" />
     <None Include="shaders\cart.vert" />
+    <None Include="shaders\general.frag" />
+    <None Include="shaders\general.vert" />
     <None Include="shaders\track.frag" />
     <None Include="shaders\track.geom" />
     <None Include="shaders\track.vert" />

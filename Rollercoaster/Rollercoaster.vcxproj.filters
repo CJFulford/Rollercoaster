@@ -70,6 +70,12 @@
     <None Include="shaders\track.vert">
       <Filter>Source Files\shaders\track</Filter>
     </None>
+    <None Include="shaders\general.frag">
+      <Filter>Source Files\shaders</Filter>
+    </None>
+    <None Include="shaders\general.vert">
+      <Filter>Source Files\shaders</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="src\controlPoints.txt">

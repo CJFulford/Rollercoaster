@@ -4,7 +4,8 @@
 #include <omp.h>
 
 
-#define trackOrder 8 // silky smooth
+#define trackOrder 6 // silky smooth
+#define arcLength 0.075f
 
 using namespace std;
 using namespace glm;
@@ -54,15 +55,13 @@ float bSpline(int order, vector<vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    float dist = 0.1f;
-
-    for (float u = 0.f; u < 1.f; u += 0.00001f)
+    for (float u = 0.f; u < 1.f; u += 0.000005f)
     {
         vec3 point = vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)
             point += (controlPoints[i] * deBoor_Cox(i, order, u));
 
-        if (u == 0.f || distance(output.back(), point) > dist)
+        if (u == 0.f || distance(output.back(), point) > arcLength)
         {
             output.push_back(point);
             maxHeight = max(maxHeight, point.y);
@@ -117,9 +116,10 @@ void generateTrackTangents(vector<vec3> &vertices, vector<vec3> &tangents)
             tangents.push_back(vertices[(i + 1) % vertices.size()] - vertices[i]);
 }
 
-float calculateSpeed(float height, float totalEnergy)
+float calculateSpeed(float height, float &totalEnergy)
 {
-    float eK = max(minKineticEnergy, totalEnergy - (cartMass * gravity * height));   // total energy - eP = eK
+    // total energy - eP = eK
+    float eK = max(minKineticEnergy, totalEnergy - (cartMass * gravity * height));
     totalEnergy = eK + (cartMass * gravity * height);
     return sqrt(eK * 2.f / cartMass); // convert eK into velocity
 }
@@ -128,45 +128,32 @@ void generateTrackNormals(vector<vec3> &vertices, vector<vec3> &tangents, vector
 {
     normals.clear();
 
+
     float totalEnergy = minKineticEnergy;   // initial eK + max eP
 
-    // loop over the track speed once so that we are not calculating the normals using the initial speed as the cart will be movin much faster at index 0 after the first loop
     for (unsigned int i = 0; i < vertices.size(); i++)
     {
-        float tengentialSpeed = calculateSpeed(vertices[i].y, totalEnergy);
-        totalEnergy -= energyLoss;
-    }
-
-    // now we start calculating the normals
-    for (unsigned int i = 0; i < vertices.size(); i++)
-    {
-        // find the tangential speed of the cart
-        float tengentialSpeed = calculateSpeed(vertices[i].y, totalEnergy);
-
-        vec3 turnDir = tangents[(i + 1) % tangents.size()] - tangents[i];
+        vec3 perpendicular = cross(tangents[i], tangents[(i + 1) % tangents.size()]);
 
 
-
-
-
-        totalEnergy -= energyLoss;
-    }
-
-    
-
-
-
-
-    //original calculation
-    for (unsigned int i = 0; i < vertices.size(); i++)
-    {
-        vec3 perpendicular = cross(tangents[i], tangents[i + 1]);
-        vec3 normal = normalize(cross(perpendicular, tangents[i]));
+        //what this results in is the direction vector for the centripital acceleration
+         vec3 normal = normalize(cross(perpendicular, tangents[i]));
 
         // this is here so that we dont get the normal flip at the top of the chain lift
         if (i < vertices.size() / 8 && normal.y < 0.f) 
-            normal *= -1;
-        normals.push_back(normal);
+            normal = normalize(-1.f * normal);
+
+        // force of gravity in the applied direction
+        vec3 gravDir = vec3(0.f, -gravity, 0.f);
+
+        // find the tangential speed of the cart
+        float timeInArc = arcLength / calculateSpeed(vertices[i].y, totalEnergy);
+
+        normal /= timeInArc;
+
+        normals.push_back(normalize(normal - gravDir));
+
+        totalEnergy -= energyLoss;
     }
     
 }
