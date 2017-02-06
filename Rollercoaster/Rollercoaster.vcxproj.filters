@@ -16,6 +16,12 @@
     <Filter Include="Source Files\shaders">
       <UniqueIdentifier>{767555fd-5cb4-426e-bb88-063f5eff73b1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\shaders\cart">
+      <UniqueIdentifier>{df7f9990-5b3d-4ae3-8c66-a529ff6a4105}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\shaders\track">
+      <UniqueIdentifier>{b5e6eac7-2f7a-4be8-bf9f-dd59c1b57259}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="libraries\GLAD V4.5\src\glad.c">
@@ -46,20 +52,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="shaders\general.frag">
-      <Filter>Source Files\shaders</Filter>
-    </None>
-    <None Include="shaders\general.vert">
-      <Filter>Source Files\shaders</Filter>
-    </None>
-    <None Include="shaders\general.geom">
-      <Filter>Source Files\shaders</Filter>
-    </None>
     <None Include="shaders\cart.frag">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\cart</Filter>
+    </None>
+    <None Include="shaders\cart.geom">
+      <Filter>Source Files\shaders\cart</Filter>
     </None>
     <None Include="shaders\cart.vert">
-      <Filter>Source Files\shaders</Filter>
+      <Filter>Source Files\shaders\cart</Filter>
+    </None>
+    <None Include="shaders\track.frag">
+      <Filter>Source Files\shaders\track</Filter>
+    </None>
+    <None Include="shaders\track.geom">
+      <Filter>Source Files\shaders\track</Filter>
+    </None>
+    <None Include="shaders\track.vert">
+      <Filter>Source Files\shaders\track</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

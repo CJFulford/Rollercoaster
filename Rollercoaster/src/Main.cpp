@@ -7,8 +7,6 @@
 #include <glm\gtc\type_ptr.hpp>
 #include <iostream>
 
-#define constEnergy 100   // min kinetic energy is 100J
-#define cartMass 200    // mass of the cart is 200Kg
 float totalEnergy = 0.f,
         maxHeight = 0.f, // max height of track. Top of chain. currently 10m
         zoom = 10.f;
@@ -19,35 +17,26 @@ float rotate_x = 0.0,
     rotate_y = 0.0;
 
 GLuint vertexArray = 0, trackProgram, cartProgram;
-std::vector<glm::vec3> vertices, tangents;
+std::vector<glm::vec3> vertices, tangents, normals;
 
-glm::vec3 center(0.f, 0.f, 0.f);
+glm::vec3 center(0.f, 5.f, 0.f);
 
 void errorCallback(int error, const char* description);
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+void motion(GLFWwindow* window, double x, double y);
 void printOpenGLVersion();
-
-void motion(GLFWwindow* window, double x, double y)
-{
-    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
-    {
-        rotate_x += (float)((y - mouse_old_y) * 0.5f);
-        rotate_y += (float)((x - mouse_old_x) * 0.5f);
-    }
-    mouse_old_x = x;
-    mouse_old_y = y;
-}
 
 void generateTrackBuffer()
 {
-    GLuint vertexBuffer, tangentBuffer;
+    GLuint vertexBuffer = 0, tangentBuffer = 0, normalBuffer = 0;
 
     glGenVertexArrays(1, &vertexArray);
     glBindVertexArray(vertexArray);
 
     maxHeight = generateTrackCurve(vertices);
     generateTrackTangents(vertices, tangents);
+    generateTrackNormals(vertices, tangents, normals, maxHeight);
 
     glGenBuffers(1, &vertexBuffer);
     glBindBuffer(GL_ARRAY_BUFFER, vertexBuffer);
@@ -61,15 +50,22 @@ void generateTrackBuffer()
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
     glEnableVertexAttribArray(1);
 
+    glGenBuffers(1, &normalBuffer);
+    glBindBuffer(GL_ARRAY_BUFFER, normalBuffer);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(normals[0]) * normals.size(), &normals[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, NULL);
+    glEnableVertexAttribArray(2);
+
     glBindVertexArray(0);
 }
 
 void generateShaders()
 {
-    trackProgram = generateProgram( "shaders/general.vert",
-                                    "shaders/general.geom",
-                                    "shaders/general.frag");
+    trackProgram = generateProgram( "shaders/track.vert",
+                                    "shaders/track.geom",
+                                    "shaders/track.frag");
     cartProgram = generateProgram(  "shaders/cart.vert",
+                                    "shaders/cart.geom",
                                     "shaders/cart.frag");
 }
 
@@ -94,8 +90,6 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
 
     passBasicUniforms(program);
 
-    glPointSize(1);
-
     glDrawArrays(GL_LINE_STRIP, 0, numVertiecs);
 
     glBindVertexArray(0);
@@ -108,7 +102,6 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
 
     passBasicUniforms(program);
     
-    glPointSize(10);
     glDrawArrays(GL_POINTS, position, 1);
 
     glBindVertexArray(0);
@@ -116,7 +109,8 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
 
 float calculateSpeed(float height)
 {
-    float eK = totalEnergy - (cartMass * gravity * height);   // total energy - eP = eK
+    float eK = max(minKineticEnergy, totalEnergy - (cartMass * gravity * height));   // total energy - eP = eK
+    totalEnergy = eK + (cartMass * gravity * height);
     return sqrt(eK * 2.f / cartMass); // convert eK into velocity
 }
 
@@ -131,7 +125,7 @@ int main()
 
 	glfwWindowHint(GLFW_RESIZABLE, false);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, true);
-	glfwWindowHint(GLFW_SAMPLES, 1);
+	glfwWindowHint(GLFW_SAMPLES, 32);
 
 	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Rollercoaster", NULL, NULL);
 
@@ -156,10 +150,10 @@ int main()
 
     generateTrackBuffer();
 
-    glfwSwapInterval(1);
+    glfwSwapInterval(3);
 
-    totalEnergy = (cartMass * gravity * maxHeight) + constEnergy;   // initial eK + max eP
-    int position = 0;
+    totalEnergy = minKineticEnergy;   // initial eK + max eP
+    float position = 0.f;
 
 	while (!glfwWindowShouldClose(window))
 	{
@@ -171,7 +165,9 @@ int main()
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 
-        position = (int)(position + calculateSpeed(vertices[position].y)) % vertices.size();
+        position = (int)(position + calculateSpeed(vertices[position].y)) % (vertices.size() - 1);
+
+        totalEnergy -= energyLoss;
 	}
 
 
@@ -192,11 +188,16 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             generateShaders();
             std::cout << "Done" << std::endl;
 			break;
+        case(GLFW_KEY_M):
+            std::cout << "Recalculating Track... ";
+            generateTrackBuffer();
+            std::cout << "Done" << std::endl;
+            break;
         case(GLFW_KEY_A):
-            center.x -= 1.f;
+            center.x += 1.f;
             break;
         case(GLFW_KEY_D):
-            center.x += 1.f;
+            center.x -= 1.f;
             break;
         case(GLFW_KEY_S):
             center.y -= 1.f;
@@ -217,6 +218,17 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
         zoom += 0.1f;
     else if (yoffset > 0)
         zoom -= 0.1f;
+}
+
+void motion(GLFWwindow* window, double x, double y)
+{
+    if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_1))
+    {
+        rotate_x += (float)((y - mouse_old_y) * 0.5f);
+        rotate_y += (float)((x - mouse_old_x) * 0.5f);
+    }
+    mouse_old_x = x;
+    mouse_old_y = y;
 }
 
 void printOpenGLVersion()
