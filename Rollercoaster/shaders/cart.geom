@@ -11,6 +11,9 @@ in vec3 vert[];
 in vec3 tang[];
 in vec3 norm[];
 
+out vec3 vector;
+out vec3 boxNorm;
+
 const float PI = 3.14159265359,
             twoPI = 3.14159265359,
             halfPI = 3.14159265359,
@@ -31,9 +34,9 @@ mat3 rotateX(float a){return mat3(1.f, 0.f, 0.f, 0.f, cos(a), -sin(a), 0.f, sin(
 mat3 rotateY(float a){return mat3(cos(a), 0.f, sin(a), 0.f, 1.f, 0.f, -sin(a), 0.f, cos(a));}
 mat3 rotateZ(float a){return mat3(cos(a), -sin(a), 0.f, sin(a), cos(a), 0.f, 0.f, 0.f, 1.0);}
 
-vec4 toOutput(vec3 input)
+vec4 toOutput(vec3 v)
 {
-    return projection * modelview * vec4(input, 1.f);
+    return projection * modelview * vec4(v, 1.f);
 }
 
 void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
@@ -45,85 +48,125 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     vec3 normal = cartHeight * normalize(cross(perpendicular, tangent));
     
     // ============================================ outer wall
-    gl_Position = toOutput(vertex + perpendicular - tangent);
+    vec3 p0 = vertex + perpendicular - tangent;
+    vec3 p1 = vertex + perpendicular + tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular + tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular - tangent + normal);
     EmitVertex();
     EndPrimitive();
     
-    gl_Position = toOutput(vertex + perpendicular + tangent + normal);
+    p0 = vertex + perpendicular + tangent + normal;
+    p1 = vertex + perpendicular - tangent + normal;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular - tangent + normal);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular + tangent);
     EmitVertex();
     EndPrimitive();
     
     // ============================================ inner wall
-    gl_Position = toOutput(vertex - perpendicular + tangent);
+    p0 = vertex - perpendicular + tangent;
+    p1 = vertex - perpendicular - tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex - perpendicular - tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular - tangent + normal);
     EmitVertex();
     EndPrimitive();
     
-    gl_Position = toOutput(vertex - perpendicular + tangent + normal);
+    p0 = vertex - perpendicular + tangent + normal;
+    p1 = vertex - perpendicular - tangent + normal;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex - perpendicular - tangent + normal);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular + tangent);
     EmitVertex();
     EndPrimitive();
     
     // ============================================ front wall
-    gl_Position = toOutput(vertex - perpendicular + tangent);
+    p0 = vertex - perpendicular + tangent;
+    p1 = vertex + perpendicular + tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular + tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular + tangent + normal);
     EmitVertex();
     EndPrimitive();
     
-    gl_Position = toOutput(vertex - perpendicular + tangent + normal);
+    p0 = vertex - perpendicular + tangent + normal;
+    p1 = vertex + perpendicular + tangent + normal;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular + tangent + normal);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular + tangent);
     EmitVertex();
     EndPrimitive();
     
     // ============================================ back wall
-    gl_Position = toOutput(vertex - perpendicular - tangent);
+    p0 = vertex - perpendicular - tangent;
+    p1 = vertex + perpendicular - tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular - tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular - tangent + normal);
     EmitVertex();
     EndPrimitive();
     
-    gl_Position = toOutput(vertex - perpendicular - tangent + normal);
+    p0 = vertex - perpendicular - tangent + normal;
+    p1 = vertex + perpendicular - tangent + normal;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular - tangent + normal);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular - tangent);
     EmitVertex();
     EndPrimitive();
     
     // ============================================ floor
-    gl_Position = toOutput(vertex - perpendicular - tangent);
+    p0 = vertex - perpendicular - tangent;
+    p1 = vertex - perpendicular + tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex - perpendicular + tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular - tangent);
     EmitVertex();
     EndPrimitive();
     
-    gl_Position = toOutput(vertex + perpendicular - tangent);
+    p0 = vertex + perpendicular - tangent;
+    p1 = vertex + perpendicular + tangent;
+    boxNorm = normalize(cross(p0, p1));
+
+    gl_Position = toOutput(p0);
     EmitVertex();
-    gl_Position = toOutput(vertex + perpendicular + tangent);
+    gl_Position = toOutput(p1);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular + tangent);
     EmitVertex();
@@ -132,7 +175,8 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
 
 void main (void)
 {
-    pointToBox(vert[0] + 0.1f * norm[0], tang[0], norm[0], cartHeightScale, cartLengthScale);
+    vector = vert[0];
+    pointToBox(vert[0], tang[0], norm[0], cartHeightScale, cartLengthScale);
 }
 
 

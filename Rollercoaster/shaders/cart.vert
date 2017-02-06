@@ -14,7 +14,7 @@ out vec3 norm;
 void main (void)
 {
     vec3 v = vertex;
-    v += 0.01f * normal; // raise the carts off of the tracks
+    v += 0.05f * normal; // raise the carts off of the tracks
 
     vert = v;
     tang = tangent;

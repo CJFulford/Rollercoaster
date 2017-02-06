@@ -6,7 +6,7 @@
 #include <vector>
 
 #define minKineticEnergy 100.f   // min kinetic energy is 100J
-#define energyLoss 40.f
+#define energyLoss 35.f
 #define cartMass 200.f    // mass of the cart is 200Kg
 #define numOfCarts 6
 

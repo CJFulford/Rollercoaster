@@ -222,12 +222,11 @@ int main()
 
         if (cartCamera)
         {
-            float personHeight = 0.5f;
+            float personHeight = 0.425f;
             zoom = 1.f;
             cam = vertices[position] + personHeight * normals[position];
             up = normals[position];
             center = vertices[position] + tangents[position] + personHeight * normals[position];
-
         }
 
 
