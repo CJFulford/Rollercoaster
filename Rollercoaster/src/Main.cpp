@@ -9,7 +9,7 @@
 
 float totalEnergy = 0.f,
         maxHeight = 0.f, // max height of track. Top of chain. currently 10m
-        zoom = 10.f;
+        zoom = defaultZoom;
 
 bool cartCamera = false;
 
@@ -19,9 +19,18 @@ float rotate_x = 0.0,
     rotate_y = 0.0;
 
 const GLfloat clearColor[] = { 0.3f, 0.6f, 1.f };
-glm::vec3 up(0.f, 1.f, 0.f),
-          cam(0.f, 0.5f, 2.f),
-          center(0.f, 5.f, 0.f);
+const glm::vec3 groundColour = glm::vec3(0.54f, 0.27f, 0.07f);
+
+
+
+glm::vec3   up(0.f, 1.f, 0.f),
+            cam(0.f, 0.5f, 2.f),
+            center(0.f, 5.f, 0.f),
+
+            sunLocation(5.f, 20.f, 0.f),
+            sunColour(0.9f, 0.9f, 0.9f);
+
+
 
 
 GLuint trackVertexArray = 0, groundVertexArray = 0, trackProgram, cartProgram, groundProgram;
@@ -116,6 +125,9 @@ void passBasicUniforms(GLuint program)
 
     glUniformMatrix4fv(glGetUniformLocation(program, "modelview"), 1, GL_FALSE, value_ptr(modelview));
     glUniformMatrix4fv(glGetUniformLocation(program, "projection"), 1, GL_FALSE, value_ptr(projection));
+
+    glUniform3fv(glGetUniformLocation(program, "sunLocation"), 1, value_ptr(sunLocation));
+    glUniform3fv(glGetUniformLocation(program, "sunColour"), 1, value_ptr(sunColour));
 }
 
 void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
@@ -124,7 +136,7 @@ void renderTrack(GLuint program, GLuint vertexArray, int numVertiecs)
     glBindVertexArray(vertexArray);
     glUseProgram(program);
 
-    glLineWidth(3);
+    glLineWidth(2);
 
     passBasicUniforms(program);
 
@@ -158,6 +170,7 @@ void renderGround(GLuint program)
     glUseProgram(program);
 
     passBasicUniforms(program);
+    glUniform3fv(glGetUniformLocation(program, "colourIn"), 1, value_ptr(groundColour));
 
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -268,10 +281,10 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
             std::cout << "Done" << std::endl;
             break;
         case(GLFW_KEY_A):
-            center.x += 1.f;
+            center.x -= 1.f;
             break;
         case(GLFW_KEY_D):
-            center.x -= 1.f;
+            center.x += 1.f;
             break;
         case(GLFW_KEY_S):
             center.y -= 1.f;

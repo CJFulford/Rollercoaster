@@ -5,7 +5,7 @@
 
 
 #define trackOrder 6 // silky smooth
-#define arcLength 0.075f
+#define arcLength 0.08f
 
 using namespace std;
 using namespace glm;
@@ -55,7 +55,7 @@ float bSpline(int order, vector<vec3> &output)
             knots.push_back(knots[i - 1] + (1.f / (controlPoints.size() - order + 1)));
     }
 
-    for (float u = 0.f; u < 1.f; u += 0.000005f)
+    for (float u = 0.f; u <= 1.f; u += 0.000005f)
     {
         vec3 point = vec3(0.f, 0.f, 0.f);
         for (int i = 0; (unsigned int)i < controlPoints.size(); i++)

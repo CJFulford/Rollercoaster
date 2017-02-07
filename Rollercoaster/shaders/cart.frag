@@ -5,19 +5,23 @@ out vec4 color;
 in vec3 vector;
 in vec3 boxNorm;
 
-vec3 sun = vec3(5.f, 20.f, 0.f);
-vec3 sunColour = vec3(1.f, 1.f, 1.f);
+uniform vec3 sunLocation;
+uniform vec3 sunColour;
 
-float phongExp = 100.f;
+
+vec3 diffuseColour = vec3(0.7f, 0.7f, 0.75f);
+vec3 specularColour = vec3(1.f, 1.f, 1.f);
+vec3 ambientColour = vec3(0.5f, 0.5f, 0.5f);
+
+float phongExp = 10000.f;
 
 
 void main (void)
 { 
+    vec3 H = (sunLocation + vector) / length(sunLocation + vector);
 
-    vec3 H = (sun + vector) / length(sun + vector);
-
-    float diffuse = max(0.f, max(   dot(normalize(sun), normalize(boxNorm)),
-                                    dot(normalize(sun), -normalize(boxNorm))
+    float diffuse = max(0.f, max(   dot(normalize(sunLocation), normalize(boxNorm)),
+                                    dot(normalize(sunLocation), -normalize(boxNorm))
                                 )
                         );
     float specular = pow(max(0.f, max(  dot(normalize(H), normalize(boxNorm)),
@@ -26,6 +30,6 @@ void main (void)
                             ), phongExp);
 
 	color = vec4(
-                vec3(0.f, 1.f, 0.f) * sunColour * diffuse
+                ambientColour + sunColour * ((diffuseColour * diffuse) + (specularColour * specular))
             , 0.f);
 }

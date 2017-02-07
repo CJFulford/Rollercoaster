@@ -59,14 +59,10 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     gl_Position = toOutput(vertex + perpendicular - tangent + normal);
     EmitVertex();
     EndPrimitive();
-    
-    p0 = vertex + perpendicular + tangent + normal;
-    p1 = vertex + perpendicular - tangent + normal;
-    boxNorm = normalize(cross(p0, p1));
 
-    gl_Position = toOutput(p0);
+    gl_Position = toOutput(vertex + perpendicular + tangent + normal);
     EmitVertex();
-    gl_Position = toOutput(p1);
+    gl_Position = toOutput(vertex + perpendicular - tangent + normal);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular + tangent);
     EmitVertex();
@@ -84,14 +80,10 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     gl_Position = toOutput(vertex - perpendicular - tangent + normal);
     EmitVertex();
     EndPrimitive();
-    
-    p0 = vertex - perpendicular + tangent + normal;
-    p1 = vertex - perpendicular - tangent + normal;
-    boxNorm = normalize(cross(p0, p1));
 
-    gl_Position = toOutput(p0);
+    gl_Position = toOutput(vertex - perpendicular + tangent + normal);
     EmitVertex();
-    gl_Position = toOutput(p1);
+    gl_Position = toOutput(vertex - perpendicular - tangent + normal);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular + tangent);
     EmitVertex();
@@ -109,14 +101,10 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     gl_Position = toOutput(vertex - perpendicular + tangent + normal);
     EmitVertex();
     EndPrimitive();
-    
-    p0 = vertex - perpendicular + tangent + normal;
-    p1 = vertex + perpendicular + tangent + normal;
-    boxNorm = normalize(cross(p0, p1));
 
-    gl_Position = toOutput(p0);
+    gl_Position = toOutput(vertex - perpendicular + tangent + normal);
     EmitVertex();
-    gl_Position = toOutput(p1);
+    gl_Position = toOutput(vertex + perpendicular + tangent + normal);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular + tangent);
     EmitVertex();
@@ -135,13 +123,9 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     EmitVertex();
     EndPrimitive();
     
-    p0 = vertex - perpendicular - tangent + normal;
-    p1 = vertex + perpendicular - tangent + normal;
-    boxNorm = normalize(cross(p0, p1));
-
-    gl_Position = toOutput(p0);
+    gl_Position = toOutput(vertex - perpendicular - tangent + normal);
     EmitVertex();
-    gl_Position = toOutput(p1);
+    gl_Position = toOutput(vertex + perpendicular - tangent + normal);
     EmitVertex();
     gl_Position = toOutput(vertex + perpendicular - tangent);
     EmitVertex();
@@ -159,14 +143,10 @@ void pointToBox(vec3 v, vec3 t, vec3 n, float cartHeight, float cartLength)
     gl_Position = toOutput(vertex + perpendicular - tangent);
     EmitVertex();
     EndPrimitive();
-    
-    p0 = vertex + perpendicular - tangent;
-    p1 = vertex + perpendicular + tangent;
-    boxNorm = normalize(cross(p0, p1));
 
-    gl_Position = toOutput(p0);
+    gl_Position = toOutput(vertex + perpendicular - tangent);
     EmitVertex();
-    gl_Position = toOutput(p1);
+    gl_Position = toOutput(vertex + perpendicular + tangent);
     EmitVertex();
     gl_Position = toOutput(vertex - perpendicular + tangent);
     EmitVertex();

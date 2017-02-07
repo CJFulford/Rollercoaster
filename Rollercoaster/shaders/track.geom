@@ -1,7 +1,7 @@
 #version 430 core
 
 layout(lines) in;
-layout(line_strip, max_vertices = 8) out;
+layout(line_strip, max_vertices = 10) out;
 
 
 uniform mat4 modelview;
@@ -38,43 +38,43 @@ void main (void)
     vec3 perpendicular = trackWidth * normalize(cross(tang[0], norm[0]));
 
 
-    // track
+    // ============================ track
     gl_Position = projection * modelview * vec4(vert[0] - perpendicular, 1.f);
     EmitVertex();
-
     gl_Position = projection * modelview * vec4(vert[1] - perpendicular, 1.f);
     EmitVertex();
-
     EndPrimitive();
-    
+
     gl_Position = projection * modelview * vec4(vert[0] + perpendicular, 1.f);
     EmitVertex();
-
     gl_Position = projection * modelview * vec4(vert[1] + perpendicular, 1.f);
     EmitVertex();
-
     EndPrimitive();
 
 
-
-    // cross bars
+    // ============================ cross bars
     colour = vec3(0.f, 0.f, 0.f);
 
     gl_Position = projection * modelview * vec4(vert[0] - perpendicular, 1.f);
     EmitVertex();
-
     gl_Position = projection * modelview * vec4(vert[0] + perpendicular, 1.f);
     EmitVertex();
-
     EndPrimitive();
 
-    gl_Position = projection * modelview * vec4(vert[1] - perpendicular, 1.f);
-    EmitVertex();
+    // ============================ supports
+    vec3 trackNorm = normalize(cross(perpendicular, tang[0]));
+    if(trackNorm.y > 0.2f)
+    {
+        colour = vec3(0.2f, 0.2f, 0.25f);
 
-    gl_Position = projection * modelview * vec4(vert[1] + perpendicular, 1.f);
-    EmitVertex();
+        gl_Position = projection * modelview * vec4(vert[0], 1.f);
+        EmitVertex();
+        gl_Position = projection * modelview * vec4(vert[0].x, 0.f, vert[0].z, 1.f);
+        EmitVertex();
+        EndPrimitive();
+    }
 
-    EndPrimitive();
+
 }
 
 
