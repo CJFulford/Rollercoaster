@@ -8,12 +8,11 @@ in vec3 boxNorm;
 uniform vec3 sunLocation;
 uniform vec3 sunColour;
 
-
 vec3 diffuseColour = vec3(0.7f, 0.7f, 0.75f);
 vec3 specularColour = vec3(1.f, 1.f, 1.f);
-vec3 ambientColour = vec3(0.5f, 0.5f, 0.5f);
+vec3 ambientColour = vec3(0.2f, 0.2f, 0.2f);
 
-float phongExp = 10000.f;
+float phongExp = 1000000.f;
 
 
 void main (void)

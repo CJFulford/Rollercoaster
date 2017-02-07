@@ -8,7 +8,7 @@
 #include <iostream>
 
 float totalEnergy = 0.f,
-        maxHeight = 0.f, // max height of track. Top of chain. currently 10m
+        maxHeight = 0.f,
         zoom = defaultZoom;
 
 bool cartCamera = false;
@@ -158,7 +158,7 @@ void renderCart(GLuint program, GLuint vertexArray, int position)
         if (pos >= 0)
             glDrawArrays(GL_POINTS, pos, 1);
         else
-            glDrawArrays(GL_POINTS, ((int)vertices.size()) + pos, 1);
+            glDrawArrays(GL_POINTS, ((int)vertices.size()) + pos - 1, 1);
     }
 
     glBindVertexArray(0);

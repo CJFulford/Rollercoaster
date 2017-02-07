@@ -135,7 +135,6 @@ void generateTrackNormals(vector<vec3> &vertices, vector<vec3> &tangents, vector
     {
         vec3 perpendicular = cross(tangents[i], tangents[(i + 1) % tangents.size()]);
 
-
         //what this results in is the direction vector for the centripital acceleration
          vec3 normal = normalize(cross(perpendicular, tangents[i]));
 
