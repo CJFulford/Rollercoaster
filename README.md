@@ -21,3 +21,5 @@ The tilt of the track factors in how fast the cart is going at that point and gr
 The velocity of the carts are based on kinetic and potential energy with a minimum energy that results in a min speed of 1m/s
 
 The cars are not considered seperatly and only the physics of the firsst car are considered
+
+The Final.zip folder contains all the final code and libraries needed to run the project. this does not contain the readme
